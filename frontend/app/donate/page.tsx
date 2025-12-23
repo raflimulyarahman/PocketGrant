@@ -9,7 +9,7 @@ import { HamburgerMenu } from '@/components/hamburger-menu'
 import { WalletButton } from '@/components/wallet-button'
 import { cn, parseIDRX } from '@/lib/utils'
 import { PROGRAM_MODE } from '@/lib/contracts'
-import { useCreateProgram } from '@/hooks/usePocketGrant'
+import { useApproveAndCreate } from '@/hooks/usePocketGrant'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
@@ -26,7 +26,7 @@ export default function DonatePage() {
   const [maxPerClaim, setMaxPerClaim] = useState('')
   const [duration, setDuration] = useState('7') // days
   
-  const { create, isPending, isConfirming, isSuccess, hash } = useCreateProgram()
+  const { approveAndCreate, step: txStep, isPending, isConfirming, isSuccess, hash } = useApproveAndCreate()
   
   const isWrongChain = isConnected && chain?.id !== baseSepolia.id
   
@@ -42,7 +42,7 @@ export default function DonatePage() {
     const now = Math.floor(Date.now() / 1000)
     const endTime = now + (parseInt(duration) * 24 * 60 * 60)
     
-    create({
+    approveAndCreate({
       totalFund: parseIDRX(amount),
       maxPerClaim: parseIDRX(maxPerClaim),
       mode: selectedMode === 'danakaget' ? PROGRAM_MODE.DanaKaget : 
@@ -53,6 +53,12 @@ export default function DonatePage() {
       giftCodeHash: '0x0000000000000000000000000000000000000000000000000000000000000000',
       requireVerification: selectedMode === 'request',
     })
+  }
+
+  const getButtonText = () => {
+    if (isPending) return txStep === 'approving' ? 'Approve IDRX...' : 'Konfirmasi...'
+    if (isConfirming) return txStep === 'approving' ? 'Approving...' : 'Membuat...'
+    return '💝 Buat Program Donasi'
   }
 
   return (
@@ -290,10 +296,10 @@ export default function DonatePage() {
                     {isPending || isConfirming ? (
                       <span className="flex items-center justify-center gap-2">
                         <Loader2 className="w-5 h-5 animate-spin" />
-                        {isPending ? 'Konfirmasi...' : 'Membuat...'}
+                        {getButtonText()}
                       </span>
                     ) : (
-                      '💝 Buat Program Donasi'
+                      getButtonText()
                     )}
                   </button>
                 </motion.div>

@@ -1,14 +1,19 @@
 import { http, createConfig } from 'wagmi'
 import { base, baseSepolia } from 'wagmi/chains'
-import { coinbaseWallet } from 'wagmi/connectors'
+import { coinbaseWallet, injected } from 'wagmi/connectors'
 
-// Coinbase Smart Wallet config for PocketGrant
+// Wagmi config with multiple wallet options
 export const config = createConfig({
   chains: [baseSepolia, base],
   connectors: [
+    // Injected wallets (MetaMask, Rabby, Coinbase Extension, etc.)
+    injected({
+      shimDisconnect: true,
+    }),
+    // Coinbase Wallet (mobile app + smart wallet)
     coinbaseWallet({
       appName: 'PocketGrant',
-      preference: 'smartWalletOnly', // Force Smart Wallet (Passkeys/FaceID)
+      preference: 'all',
     }),
   ],
   transports: {
@@ -16,3 +21,5 @@ export const config = createConfig({
     [base.id]: http(),
   },
 })
+
+

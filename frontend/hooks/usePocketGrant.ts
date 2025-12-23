@@ -1,9 +1,34 @@
 'use client'
 
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
-import { POCKETGRANT_ADDRESS, POCKETGRANT_ABI } from '@/lib/contracts'
-import { useEffect } from 'react'
+import { POCKETGRANT_ADDRESS, POCKETGRANT_ABI, IDRX_ADDRESS } from '@/lib/contracts'
+import { useEffect, useState, useCallback } from 'react'
 import { toast } from 'sonner'
+
+// ERC20 ABI for approve
+const ERC20_ABI = [
+  {
+    inputs: [
+      { name: 'spender', type: 'address' },
+      { name: 'amount', type: 'uint256' }
+    ],
+    name: 'approve',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      { name: 'owner', type: 'address' },
+      { name: 'spender', type: 'address' }
+    ],
+    name: 'allowance',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function'
+  }
+] as const
+
 
 // ===== READ HOOKS =====
 
@@ -247,7 +272,132 @@ export function useCreateProgram() {
   return { create, hash, isPending, isConfirming, isSuccess, error, reset }
 }
 
-// ===== PROVIDER HOOKS =====
+// Create program with IDRX approval (2-step flow)
+export function useApproveAndCreate() {
+  const [step, setStep] = useState<'idle' | 'approving' | 'creating' | 'done'>('idle')
+  const [pendingConfig, setPendingConfig] = useState<{
+    totalFund: bigint
+    maxPerClaim: bigint
+    mode: number
+    capPerWallet: bigint
+    start: bigint
+    end: bigint
+    giftCodeHash: `0x${string}`
+    requireVerification: boolean
+  } | null>(null)
+
+  // Approve IDRX
+  const { 
+    data: approveHash, 
+    writeContract: writeApprove, 
+    isPending: isApprovePending,
+    error: approveError,
+    reset: resetApprove
+  } = useWriteContract()
+  
+  const { 
+    isLoading: isApproveConfirming, 
+    isSuccess: isApproveSuccess 
+  } = useWaitForTransactionReceipt({ hash: approveHash })
+
+  // Create Program
+  const { 
+    data: createHash, 
+    writeContract: writeCreate, 
+    isPending: isCreatePending,
+    error: createError,
+    reset: resetCreate
+  } = useWriteContract()
+  
+  const { 
+    isLoading: isCreateConfirming, 
+    isSuccess: isCreateSuccess 
+  } = useWaitForTransactionReceipt({ hash: createHash })
+
+  // After approve success, proceed to create
+  useEffect(() => {
+    if (isApproveSuccess && step === 'approving' && pendingConfig) {
+      setStep('creating')
+      toast.loading('Membuat program...', { id: 'create-tx' })
+      writeCreate({
+        address: POCKETGRANT_ADDRESS,
+        abi: POCKETGRANT_ABI,
+        functionName: 'createProgram',
+        args: [pendingConfig],
+      })
+    }
+  }, [isApproveSuccess, step, pendingConfig, writeCreate])
+
+  // Handle create success
+  useEffect(() => {
+    if (isCreateSuccess && step === 'creating') {
+      setStep('done')
+      toast.success('✅ Program berhasil dibuat!', { id: 'create-tx' })
+    }
+  }, [isCreateSuccess, step])
+
+  // Handle errors
+  useEffect(() => {
+    if (approveError) {
+      const msg = parseError(approveError)
+      toast.error(`Approve gagal: ${msg}`, { id: 'create-tx' })
+      setStep('idle')
+    }
+  }, [approveError])
+
+  useEffect(() => {
+    if (createError) {
+      const msg = parseError(createError)
+      toast.error(`Create gagal: ${msg}`, { id: 'create-tx' })
+      setStep('idle')
+    }
+  }, [createError])
+
+  const approveAndCreate = useCallback((config: {
+    totalFund: bigint
+    maxPerClaim: bigint
+    mode: number
+    capPerWallet: bigint
+    start: bigint
+    end: bigint
+    giftCodeHash: `0x${string}`
+    requireVerification: boolean
+  }) => {
+    setPendingConfig(config)
+    setStep('approving')
+    toast.loading('Approving IDRX...', { id: 'create-tx' })
+    
+    writeApprove({
+      address: IDRX_ADDRESS,
+      abi: ERC20_ABI,
+      functionName: 'approve',
+      args: [POCKETGRANT_ADDRESS, config.totalFund],
+    })
+  }, [writeApprove])
+
+  const reset = useCallback(() => {
+    setStep('idle')
+    setPendingConfig(null)
+    resetApprove()
+    resetCreate()
+  }, [resetApprove, resetCreate])
+
+  const isPending = isApprovePending || isCreatePending
+  const isConfirming = isApproveConfirming || isCreateConfirming
+  const isSuccess = isCreateSuccess
+
+  return { 
+    approveAndCreate, 
+    step,
+    hash: createHash,
+    isPending, 
+    isConfirming, 
+    isSuccess, 
+    error: approveError || createError,
+    reset 
+  }
+}
+
 
 export function usePauseProgram() {
   const { data: hash, writeContract, isPending, error } = useWriteContract()
