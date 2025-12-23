@@ -87,6 +87,7 @@ export default function Home() {
                   <div>
                     <h2 className="text-xl font-bold text-white">Request Dana</h2>
                     <p className="text-white/80 text-sm">Ajukan permohonan bantuan</p>
+                    <p className="text-white/60 text-xs mt-1">📝 Bisa ajukan berkali-kali</p>
                   </div>
                 </div>
                 <ChevronRight className="w-6 h-6 text-white/80 group-hover:translate-x-1 transition-transform" />
@@ -115,6 +116,7 @@ export default function Home() {
               </div>
               <h3 className="font-bold text-foreground mb-1">Dana Kaget</h3>
               <p className="text-sm text-muted-foreground">Klaim dana gratis</p>
+              <p className="text-xs text-accent mt-1">⚡ 1x klaim per program</p>
             </div>
           </Link>
 
@@ -133,7 +135,7 @@ export default function Home() {
                 <Gift className="w-6 h-6 text-purple-500" />
               </div>
               <h3 className="font-bold text-foreground mb-1">Gift Card</h3>
-              <p className="text-sm text-muted-foreground">Segera hadir</p>
+              <p className="text-sm text-muted-foreground">Butuh kode rahasia</p>
             </div>
           </Link>
         </motion.div>

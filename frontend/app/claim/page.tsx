@@ -100,6 +100,7 @@ export default function ClaimHubPage() {
                 <div className="flex-1">
                   <h3 className="font-bold text-foreground mb-1">Dana Kaget</h3>
                   <p className="text-sm text-muted-foreground">Klaim dana gratis secara acak</p>
+                  <p className="text-xs text-accent mt-1">⚡ 1x klaim per program</p>
                 </div>
                 <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-1 transition-transform" />
               </div>
@@ -118,6 +119,7 @@ export default function ClaimHubPage() {
                 <div className="flex-1">
                   <h3 className="font-bold text-foreground mb-1">Gift Card</h3>
                   <p className="text-sm text-muted-foreground">Klaim dengan kode rahasia</p>
+                  <p className="text-xs text-purple-500 mt-1">🔑 Butuh kode valid</p>
                 </div>
                 <span className="px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-500 text-xs font-medium">
                   Soon

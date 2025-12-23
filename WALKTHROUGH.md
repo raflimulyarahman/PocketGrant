@@ -16,6 +16,16 @@ PocketGrant adalah platform distribusi dana pendidikan berbasis blockchain yang 
 | 📝 **Request**    | Submit request, provider approves      | Beasiswa terverifikasi        |
 | 🎁 **GiftCard**   | Claim dengan secret code               | Share via QR/link privat      |
 
+### ⚡ Aturan Claim per Mode
+
+| Mode              | Aturan                             | Penjelasan                                           |
+| ----------------- | ---------------------------------- | ---------------------------------------------------- |
+| 🎉 **Dana Kaget** | **1x per program per wallet**      | Sekali klaim langsung, tidak bisa klaim ulang        |
+| 📝 **Request**    | **Unlimited submissions**          | Bisa ajukan berkali-kali, tunggu approval provider   |
+| 🎁 **GiftCard**   | **Unlimited attempts, butuh kode** | Bisa coba berkali-kali, butuh kode valid untuk klaim |
+
+> 💡 **Catatan:** User dapat berpartisipasi di **program yang berbeda** dengan mode yang berbeda. Aturan di atas berlaku **per program**.
+
 ---
 
 ## 🏗️ Entity Relationship Diagram (ERD)
