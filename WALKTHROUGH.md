@@ -32,60 +32,19 @@ erDiagram
     VERIFIER ||--o{ BENEFICIARY : verifies
     BENEFICIARY ||--o{ REQUEST : submits
     BENEFICIARY ||--o{ CLAIM : performs
-
-    ADMIN {
-        address wallet PK
-        bool canPauseGlobal
-        bool canManageVerifiers
-    }
-
-    VERIFIER {
-        address wallet PK
-        bool isActive
-        address addedBy FK
-    }
-
-    PROVIDER {
-        address wallet PK
-    }
-
-    PROGRAM {
-        uint256 programId PK
-        address provider FK
-        uint256 totalFund
-        uint256 remainingFund
-        uint256 maxPerClaim
-        enum mode "Request|DanaKaget|GiftCard"
-        enum status "Active|Paused|Ended"
-        uint256 capPerWallet
-        uint64 startTime
-        uint64 endTime
-        bytes32 giftCodeHash
-        bool requireVerification
-    }
-
-    REQUEST {
-        uint256 requestId PK
-        uint256 programId FK
-        address requester FK
-        uint256 amount
-        bool approved
-        bool paid
-    }
-
-    CLAIM {
-        uint256 programId FK
-        address claimant FK
-        uint256 amount
-        bool hasClaimed
-    }
-
-    BENEFICIARY {
-        address wallet PK
-        uint256 programId FK
-        bool isVerified
-    }
 ```
+
+### 📋 Entity Details
+
+| Entity          | Key Fields                                                                                                                                    |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ADMIN**       | wallet, canPauseGlobal, canManageVerifiers                                                                                                    |
+| **VERIFIER**    | wallet, isActive, addedBy                                                                                                                     |
+| **PROVIDER**    | wallet                                                                                                                                        |
+| **PROGRAM**     | programId, provider, totalFund, remainingFund, maxPerClaim, mode, status, capPerWallet, startTime, endTime, giftCodeHash, requireVerification |
+| **REQUEST**     | requestId, programId, requester, amount, approved, paid                                                                                       |
+| **CLAIM**       | programId, claimant, amount, hasClaimed                                                                                                       |
+| **BENEFICIARY** | wallet, programId, isVerified                                                                                                                 |
 
 ---
 
