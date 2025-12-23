@@ -93,14 +93,13 @@ erDiagram
 
 ### 🎨 Keterangan Warna Diagram:
 
-| Warna            | Nama Class   | Arti / Tipe Node  | Contoh Penggunaan                   |
-| :--------------- | :----------- | :---------------- | :---------------------------------- |
-| 🔵 **Biru**      | `startNode`  | Titik Mulai       | Login, Buka Link                    |
-| 🔹 **Biru Muda** | `actionNode` | Aksi / Proses     | Klik Tombol, Input Data, Submit     |
-| 🟡 **Kuning**    | `decision`   | Keputusan / Cek   | Pilihan Menu, Cek Saldo/Role        |
-| 🟢 **Hijau**     | `success`    | Berhasil / Lanjut | Dana Cair, Transaksi Sukses, Resume |
-| 🔴 **Merah**     | `danger`     | Bahaya / Berhenti | Program Berakhir, Pause, Dana Habis |
-| ⚪ **Abu-abu**   | `infoNode`   | Info Tambahan     | Event Kontrak, Label Mode           |
+| Warna          | Nama Class   | Arti / Tipe Node  | Contoh Penggunaan                   |
+| :------------- | :----------- | :---------------- | :---------------------------------- |
+| 🟢 **Hijau**   | `positive`   | Mulai / Berhasil  | Login, Buka Link, Selesai           |
+| 🔵 **Biru**    | `actionNode` | Aksi / Proses     | Klik Tombol, Input Data, Submit     |
+| 🟡 **Kuning**  | `decision`   | Keputusan / Cek   | Pilihan Menu, Cek Saldo/Role        |
+| 🔴 **Merah**   | `danger`     | Bahaya / Berhenti | Program Berakhir, Pause, Dana Habis |
+| ⚪ **Abu-abu** | `infoNode`   | Info Tambahan     | Event Kontrak, Label Mode           |
 
 ### 1. 🔐 Admin Flow
 
@@ -108,14 +107,13 @@ Admin adalah super-user yang memiliki kontrol global atas sistem.
 
 ```mermaid
 flowchart TD
-    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
     classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
     classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A["Admin Login"]:::startNode --> B{Pilih Aksi}:::decision
+    A["Admin Login"]:::positive --> B{Pilih Aksi}:::decision
 
     B --> C["Manage Verifiers"]:::actionNode
     C --> C1["setVerifier - Add Verifier"]:::actionNode
@@ -123,7 +121,7 @@ flowchart TD
 
     B --> D["Emergency Controls"]:::actionNode
     D --> D1["setGlobalPause - Pause All"]:::danger
-    D --> D2["setGlobalPause - Resume All"]:::success
+    D --> D2["setGlobalPause - Resume All"]:::positive
 
     B --> E["Transfer Admin"]:::actionNode
     E --> E1["transferAdmin to New Address"]:::actionNode
@@ -150,14 +148,13 @@ Provider adalah penyedia dana yang membuat dan mengelola program distribusi.
 
 ```mermaid
 flowchart TD
-    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
     classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
     classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A["Provider Login"]:::startNode --> B["Approve IDRX Token"]:::actionNode
+    A["Provider Login"]:::positive --> B["Approve IDRX Token"]:::actionNode
     B --> C["Create Program"]:::actionNode
 
     C --> D{Pilih Mode}:::decision
@@ -171,13 +168,13 @@ flowchart TD
     F --> E
 
     E --> G["Deposit IDRX ke Contract"]:::actionNode
-    G --> H["Program Created!"]:::success
+    G --> H["Program Created!"]:::positive
     H --> I["Share Link/QR"]:::actionNode
 
     subgraph "Program Management"
         J["Top Up Program"]:::actionNode
         K["Pause Program"]:::danger
-        L["Resume Program"]:::success
+        L["Resume Program"]:::positive
         M["End Program"]:::danger
         N["Withdraw Remaining"]:::danger
     end
@@ -190,7 +187,7 @@ flowchart TD
 
     subgraph "Request Mode Only"
         O["Review Requests"]:::actionNode
-        O --> P["Approve & Pay"]:::success
+        O --> P["Approve & Pay"]:::positive
     end
 
     D2 --> O
@@ -215,13 +212,12 @@ Verifier bertanggung jawab memverifikasi beneficiary sebelum mereka bisa claim/r
 
 ```mermaid
 flowchart TD
-    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
     classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A["Verifier Login"]:::startNode --> B{Verifikasi Beneficiary}:::decision
+    A["Verifier Login"]:::positive --> B{Verifikasi Beneficiary}:::decision
 
     B --> C["Single Verification"]:::actionNode
     C --> C1["verifyBeneficiary(programId, beneficiary)"]:::actionNode
@@ -232,7 +228,7 @@ flowchart TD
     C1 --> E["Emit BeneficiaryVerified Event"]:::infoNode
     D1 --> E
 
-    E --> F["Beneficiary Dapat Claim/Request"]:::success
+    E --> F["Beneficiary Dapat Claim/Request"]:::positive
 ```
 
 **Fungsi Verifier:**
@@ -249,14 +245,13 @@ Beneficiary adalah penerima dana yang melakukan claim atau submit request.
 
 ```mermaid
 flowchart TD
-    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
     classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
     classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A["User Buka Link/QR"]:::startNode --> B["Connect Wallet"]:::actionNode
+    A["User Buka Link/QR"]:::positive --> B["Connect Wallet"]:::actionNode
     B --> C{Check Program Mode}:::decision
 
     C --> D["Dana Kaget Mode"]:::infoNode
@@ -266,7 +261,7 @@ flowchart TD
     D3 -->|Ya| D4["Tap AMBIL DANA"]:::actionNode
     D3 -->|Tidak| D5["Tampilkan Dana Habis"]:::danger
     D4 --> D6["claimDanaKaget"]:::actionNode
-    D6 --> D7["🎉 Dana Masuk Wallet!"]:::success
+    D6 --> D7["🎉 Dana Masuk Wallet!"]:::positive
 
     C --> E["Request Mode"]:::infoNode
     E --> E1{Perlu Verifikasi?}:::decision
@@ -275,7 +270,7 @@ flowchart TD
     E2 -->|Ya| E4["Submit Request"]:::actionNode
     E1 -->|Tidak| E4
     E4 --> E5["Tunggu Approval Provider"]:::actionNode
-    E5 --> E6["Dana Masuk saat Approved!"]:::success
+    E5 --> E6["Dana Masuk saat Approved!"]:::positive
 
     C --> F["GiftCard Mode"]:::infoNode
     F --> F1{Perlu Verifikasi?}:::decision
@@ -286,7 +281,7 @@ flowchart TD
     F4 --> F5{Code Valid?}:::decision
     F5 -->|Ya| F6["claimGift"]:::actionNode
     F5 -->|Tidak| F7["Invalid Code Error"]:::danger
-    F6 --> F8["🎁 Dana Masuk Wallet!"]:::success
+    F6 --> F8["🎁 Dana Masuk Wallet!"]:::positive
 ```
 
 **Fungsi Beneficiary:**
