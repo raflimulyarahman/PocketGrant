@@ -89,7 +89,18 @@ erDiagram
 
 ---
 
-## 👥 Role-Based Flow Diagrams
+## 📅 Alur Kerja Aplikasi (Role-Based Flows)
+
+### 🎨 Keterangan Warna Diagram:
+
+| Warna            | Nama Class   | Arti / Tipe Node  | Contoh Penggunaan                   |
+| :--------------- | :----------- | :---------------- | :---------------------------------- |
+| 🔵 **Biru**      | `startNode`  | Titik Mulai       | Login, Buka Link                    |
+| 🔹 **Biru Muda** | `actionNode` | Aksi / Proses     | Klik Tombol, Input Data, Submit     |
+| 🟡 **Kuning**    | `decision`   | Keputusan / Cek   | Pilihan Menu, Cek Saldo/Role        |
+| 🟢 **Hijau**     | `success`    | Berhasil / Lanjut | Dana Cair, Transaksi Sukses, Resume |
+| 🔴 **Merah**     | `danger`     | Bahaya / Berhenti | Program Berakhir, Pause, Dana Habis |
+| ⚪ **Abu-abu**   | `infoNode`   | Info Tambahan     | Event Kontrak, Label Mode           |
 
 ### 1. 🔐 Admin Flow
 
@@ -97,34 +108,31 @@ Admin adalah super-user yang memiliki kontrol global atas sistem.
 
 ```mermaid
 flowchart TD
-    classDef adminLogin stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef manage stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
-    classDef emergency stroke:#333,stroke-width:1px,fill:#f3e5f5,color:#000
-    classDef transfer stroke:#333,stroke-width:1px,fill:#e3f2fd,color:#000
-    classDef event stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
-
-    A[Admin Login]:::adminLogin --> B{Pilih Aksi}:::decision
-
-    B --> C[Manage Verifiers]:::manage
-    C --> C1[setVerifier - Add Verifier]:::manage
-    C --> C2[setVerifier - Remove Verifier]:::manage
-
-    B --> D[Emergency Controls]:::emergency
-    D --> D1[setGlobalPause - Pause All]:::danger
-    D --> D2[setGlobalPause - Resume All]:::success
-
-    B --> E[Transfer Admin]:::transfer
-    E --> E1[transferAdmin to New Address]:::transfer
-
-    C1 --> F[Emit VerifierUpdated Event]:::event
-    C2 --> F
-    D1 --> G[Emit GlobalPauseUpdated Event]:::event
-    D2 --> G
-    E1 --> H[Emit AdminTransferred Event]:::event
-
     classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
+
+    A["Admin Login"]:::startNode --> B{Pilih Aksi}:::decision
+
+    B --> C["Manage Verifiers"]:::actionNode
+    C --> C1["setVerifier - Add Verifier"]:::actionNode
+    C --> C2["setVerifier - Remove Verifier"]:::actionNode
+
+    B --> D["Emergency Controls"]:::actionNode
+    D --> D1["setGlobalPause - Pause All"]:::danger
+    D --> D2["setGlobalPause - Resume All"]:::success
+
+    B --> E["Transfer Admin"]:::actionNode
+    E --> E1["transferAdmin to New Address"]:::actionNode
+
+    C1 --> F["Emit VerifierUpdated Event"]:::infoNode
+    C2 --> F
+    D1 --> G["Emit GlobalPauseUpdated Event"]:::infoNode
+    D2 --> G
+    E1 --> H["Emit AdminTransferred Event"]:::infoNode
 ```
 
 **Fungsi Admin:**
@@ -143,35 +151,35 @@ Provider adalah penyedia dana yang membuat dan mengelola program distribusi.
 ```mermaid
 flowchart TD
     classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef action stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
-    classDef subNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
     classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A[Provider Login]:::startNode --> B[Approve IDRX Token]:::action
-    B --> C[Create Program]:::action
+    A["Provider Login"]:::startNode --> B["Approve IDRX Token"]:::actionNode
+    B --> C["Create Program"]:::actionNode
 
     C --> D{Pilih Mode}:::decision
-    D --> D1[Dana Kaget Mode]:::action
-    D --> D2[Request Mode]:::action
-    D --> D3[GiftCard Mode]:::action
+    D --> D1["Dana Kaget Mode"]:::actionNode
+    D --> D2["Request Mode"]:::actionNode
+    D --> D3["GiftCard Mode"]:::actionNode
 
-    D1 --> E[Set Config]:::subNode
+    D1 --> E["Set Config"]:::infoNode
     D2 --> E
-    D3 --> F[Generate Gift Code Hash]:::subNode
+    D3 --> F["Generate Gift Code Hash"]:::infoNode
     F --> E
 
-    E --> G[Deposit IDRX ke Contract]:::action
-    G --> H[Program Created!]:::success
-    H --> I[Share Link/QR]:::action
+    E --> G["Deposit IDRX ke Contract"]:::actionNode
+    G --> H["Program Created!"]:::success
+    H --> I["Share Link/QR"]:::actionNode
 
     subgraph "Program Management"
-        J[Top Up Program]:::action
-        K[Pause Program]:::danger
-        L[Resume Program]:::success
-        M[End Program]:::danger
-        N[Withdraw Remaining]:::danger
+        J["Top Up Program"]:::actionNode
+        K["Pause Program"]:::danger
+        L["Resume Program"]:::success
+        M["End Program"]:::danger
+        N["Withdraw Remaining"]:::danger
     end
 
     H --> J
@@ -181,8 +189,8 @@ flowchart TD
     M --> N
 
     subgraph "Request Mode Only"
-        O[Review Requests]:::action
-        O --> P[Approve & Pay]:::success
+        O["Review Requests"]:::actionNode
+        O --> P["Approve & Pay"]:::success
     end
 
     D2 --> O
@@ -208,23 +216,23 @@ Verifier bertanggung jawab memverifikasi beneficiary sebelum mereka bisa claim/r
 ```mermaid
 flowchart TD
     classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef action stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
-    classDef subNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A[Verifier Login]:::startNode --> B{Verifikasi Beneficiary}:::decision
+    A["Verifier Login"]:::startNode --> B{Verifikasi Beneficiary}:::decision
 
-    B --> C[Single Verification]:::action
-    C --> C1["verifyBeneficiary(programId, beneficiary)"]:::action
+    B --> C["Single Verification"]:::actionNode
+    C --> C1["verifyBeneficiary(programId, beneficiary)"]:::actionNode
 
-    B --> D[Batch Verification]:::action
-    D --> D1["verifyBeneficiaries(programId, beneficiaries[])"]:::action
+    B --> D["Batch Verification"]:::actionNode
+    D --> D1["verifyBeneficiaries(programId, beneficiaries[])"]:::actionNode
 
-    C1 --> E[Emit BeneficiaryVerified Event]:::subNode
+    C1 --> E["Emit BeneficiaryVerified Event"]:::infoNode
     D1 --> E
 
-    E --> F[Beneficiary Dapat Claim/Request]:::success
+    E --> F["Beneficiary Dapat Claim/Request"]:::success
 ```
 
 **Fungsi Verifier:**
@@ -242,43 +250,43 @@ Beneficiary adalah penerima dana yang melakukan claim atau submit request.
 ```mermaid
 flowchart TD
     classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
-    classDef action stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
     classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
     classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
-    classDef info stroke:#333,stroke-width:1px,fill:#e0f7fa,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    A[User Buka Link/QR]:::startNode --> B[Connect Wallet]:::action
+    A["User Buka Link/QR"]:::startNode --> B["Connect Wallet"]:::actionNode
     B --> C{Check Program Mode}:::decision
 
-    C --> D[Dana Kaget Mode]:::info
+    C --> D["Dana Kaget Mode"]:::infoNode
     D --> D1{Sudah Claim?}:::decision
-    D1 -->|Ya| D2[Tampilkan Sudah Klaim]:::decision
+    D1 -->|Ya| D2["Tampilkan Sudah Klaim"]:::infoNode
     D1 -->|Tidak| D3{Dana Tersedia?}:::decision
-    D3 -->|Ya| D4["Tap AMBIL DANA"]:::action
-    D3 -->|Tidak| D5[Tampilkan Dana Habis]:::danger
-    D4 --> D6[claimDanaKaget]:::action
-    D6 --> D7[🎉 Dana Masuk Wallet!]:::success
+    D3 -->|Ya| D4["Tap AMBIL DANA"]:::actionNode
+    D3 -->|Tidak| D5["Tampilkan Dana Habis"]:::danger
+    D4 --> D6["claimDanaKaget"]:::actionNode
+    D6 --> D7["🎉 Dana Masuk Wallet!"]:::success
 
-    C --> E[Request Mode]:::info
+    C --> E["Request Mode"]:::infoNode
     E --> E1{Perlu Verifikasi?}:::decision
     E1 -->|Ya| E2{Sudah Verified?}:::decision
-    E2 -->|Tidak| E3[Tunggu Verifikasi]:::decision
-    E2 -->|Ya| E4[Submit Request]:::action
+    E2 -->|Tidak| E3["Tunggu Verifikasi"]:::infoNode
+    E2 -->|Ya| E4["Submit Request"]:::actionNode
     E1 -->|Tidak| E4
-    E4 --> E5[Tunggu Approval Provider]:::action
-    E5 --> E6[Dana Masuk saat Approved!]:::success
+    E4 --> E5["Tunggu Approval Provider"]:::actionNode
+    E5 --> E6["Dana Masuk saat Approved!"]:::success
 
-    C --> F[GiftCard Mode]:::info
+    C --> F["GiftCard Mode"]:::infoNode
     F --> F1{Perlu Verifikasi?}:::decision
     F1 -->|Ya| F2{Sudah Verified?}:::decision
-    F2 -->|Tidak| F3[Tunggu Verifikasi]:::decision
-    F2 -->|Ya| F4[Masukkan Gift Code]:::action
+    F2 -->|Tidak| F3["Tunggu Verifikasi"]:::infoNode
+    F2 -->|Ya| F4["Masukkan Gift Code"]:::actionNode
     F1 -->|Tidak| F4
     F4 --> F5{Code Valid?}:::decision
-    F5 -->|Ya| F6[claimGift]:::action
-    F5 -->|Tidak| F7[Invalid Code Error]:::danger
-    F6 --> F8[🎁 Dana Masuk Wallet!]:::success
+    F5 -->|Ya| F6["claimGift"]:::actionNode
+    F5 -->|Tidak| F7["Invalid Code Error"]:::danger
+    F6 --> F8["🎁 Dana Masuk Wallet!"]:::success
 ```
 
 **Fungsi Beneficiary:**
