@@ -8,7 +8,10 @@ import { CheckCircle2, XCircle, Loader2, Gift, ExternalLink, Sparkles } from 'lu
 import { useProgram, useCanClaim, useHasClaimed } from '@/hooks/usePocketGrant'
 import { formatIDRX, truncateAddress, getExplorerUrl, cn } from '@/lib/utils'
 import { POCKETGRANT_ADDRESS, POCKETGRANT_ABI } from '@/lib/contracts'
+import { withPaymaster, isPaymasterEnabled } from '@/lib/paymaster'
 import { WalletButton } from './wallet-button'
+import { ClaimSkeleton } from './skeleton'
+import { GaslessBadge, GaslessInfo } from './gasless-badge'
 import confetti from 'canvas-confetti'
 import { toast } from 'sonner'
 
@@ -23,6 +26,12 @@ export function ClaimCard({ programId }: ClaimCardProps) {
   const { switchChain } = useSwitchChain()
   const [state, setState] = useState<ClaimState>('loading')
   const [claimedAmount, setClaimedAmount] = useState<bigint>(0n)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   
   // Contract reads
   const { data: program, isLoading: loadingProgram } = useProgram(programId)
@@ -100,31 +109,20 @@ export function ClaimCard({ programId }: ClaimCardProps) {
     
     toast.loading('Menunggu konfirmasi...', { id: 'claim' })
     
-    // Check if paymaster is configured for gasless
-    const paymasterUrl = process.env.NEXT_PUBLIC_PAYMASTER_URL
-    
-    writeContract({
+    // Use paymaster helper for gasless support
+    writeContract(withPaymaster({
       address: POCKETGRANT_ADDRESS,
       abi: POCKETGRANT_ABI,
       functionName: 'claimDanaKaget',
       args: [programId],
-      // Paymaster for gasless claims (if configured)
-      ...(paymasterUrl && {
-        // @ts-ignore - capabilities for paymaster
-        capabilities: {
-          paymasterService: {
-            url: paymasterUrl,
-          },
-        },
-      }),
-    })
+    }))
   }
 
   const providerAddress = program?.[0]
   const totalFund = program?.[1] || 0n
   const remainingFund = program?.[2] || 0n
   const maxPerClaim = program?.[3] || 0n
-  const isGasless = !!process.env.NEXT_PUBLIC_PAYMASTER_URL
+  const isGasless = isPaymasterEnabled()
 
   return (
     <div className="w-full max-w-md mx-auto">
@@ -164,10 +162,25 @@ export function ClaimCard({ programId }: ClaimCardProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="text-center py-8"
+              className="space-y-6"
             >
-              <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
-              <p className="text-muted-foreground">Memuat data...</p>
+              {/* Amount skeleton */}
+              <div className="p-4 rounded-2xl bg-muted/50 border border-border">
+                <div className="h-4 w-28 mx-auto mb-2 rounded bg-muted animate-pulse" />
+                <div className="h-10 w-36 mx-auto rounded bg-muted animate-pulse" />
+              </div>
+
+              {/* Progress skeleton */}
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <div className="h-4 w-16 rounded bg-muted animate-pulse" />
+                  <div className="h-4 w-24 rounded bg-muted animate-pulse" />
+                </div>
+                <div className="h-2 w-full rounded-full bg-muted animate-pulse" />
+              </div>
+
+              {/* Button skeleton */}
+              <div className="h-14 w-full rounded-2xl bg-muted animate-pulse" />
             </motion.div>
           )}
 
@@ -212,7 +225,7 @@ export function ClaimCard({ programId }: ClaimCardProps) {
               )}
 
               {/* Action */}
-              {!isConnected ? (
+              {!mounted || !isConnected ? (
                 <div className="flex justify-center">
                   <WalletButton />
                 </div>

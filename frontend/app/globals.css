@@ -98,3 +98,132 @@
 .animate-pulse-scale {
   animation: pulse-scale 2s ease-in-out infinite;
 }
+
+/* ===== MOBILE UX IMPROVEMENTS ===== */
+
+/* Touch-friendly tap targets (44px minimum) */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Remove tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Safe area padding for notched devices */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}
+
+/* Mobile-first button styles */
+@layer components {
+  .btn-touch {
+    @apply min-h-[48px] px-6 rounded-xl font-medium;
+    @apply active:scale-[0.98] transition-transform;
+    @apply touch-manipulation;
+  }
+
+  .btn-primary {
+    @apply min-h-[48px] px-6 rounded-xl font-medium;
+    @apply active:scale-[0.98] transition-transform touch-manipulation;
+    @apply bg-primary text-primary-foreground;
+    @apply hover:bg-primary/90 active:bg-primary/80;
+    @apply shadow-lg shadow-primary/25;
+  }
+
+  .btn-secondary {
+    @apply min-h-[48px] px-6 rounded-xl font-medium;
+    @apply active:scale-[0.98] transition-transform touch-manipulation;
+    @apply bg-muted text-foreground;
+    @apply hover:bg-muted/80 active:bg-muted/70;
+  }
+
+  .btn-danger {
+    @apply min-h-[48px] px-6 rounded-xl font-medium;
+    @apply active:scale-[0.98] transition-transform touch-manipulation;
+    @apply bg-destructive text-white;
+    @apply hover:bg-destructive/90 active:bg-destructive/80;
+  }
+}
+
+/* Input focus states for mobile */
+@layer components {
+  .input-touch {
+    @apply min-h-[48px] px-4 rounded-xl border border-border;
+    @apply bg-background text-foreground;
+    @apply focus:border-primary focus:ring-2 focus:ring-primary/20;
+    @apply outline-none transition-all;
+    @apply text-base; /* Prevents zoom on iOS */
+  }
+}
+
+/* Card tap animation */
+@layer components {
+  .card-touch {
+    @apply active:scale-[0.98] transition-transform duration-150;
+    @apply touch-manipulation cursor-pointer;
+  }
+}
+
+/* Responsive text scaling */
+@layer utilities {
+  .text-responsive-sm {
+    @apply text-sm sm:text-base;
+  }
+  .text-responsive-base {
+    @apply text-base sm:text-lg;
+  }
+  .text-responsive-lg {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  .text-responsive-xl {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+}
+
+/* Mobile-friendly spacing */
+@layer utilities {
+  .px-safe {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Prevent text selection on interactive elements */
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--muted-foreground) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}

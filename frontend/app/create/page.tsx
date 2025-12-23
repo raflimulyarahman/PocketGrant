@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useSwitchChain } from 'wagmi'
 import { baseSepolia } from 'wagmi/chains'
 import { motion } from 'framer-motion'
@@ -19,6 +19,12 @@ export default function CreateProgramPage() {
   const { address, isConnected, chain } = useAccount()
   const { switchChain } = useSwitchChain()
   const [step, setStep] = useState<Step>('input')
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
   
   // Form state
   const [totalAmount, setTotalAmount] = useState('')
@@ -153,7 +159,7 @@ export default function CreateProgramPage() {
             className="space-y-6"
           >
             {/* Wallet Check */}
-            {!isConnected && (
+            {(!mounted || !isConnected) && (
               <BentoCard>
                 <div className="text-center py-4">
                   <p className="text-gray-600 mb-4">Hubungkan dompet untuk melanjutkan</p>
@@ -162,7 +168,7 @@ export default function CreateProgramPage() {
               </BentoCard>
             )}
 
-            {isConnected && isWrongChain && (
+            {mounted && isConnected && isWrongChain && (
               <BentoCard variant="accent">
                 <div className="text-center py-4">
                   <p className="text-gray-600 mb-4">Ganti ke jaringan Base Sepolia</p>
@@ -176,7 +182,7 @@ export default function CreateProgramPage() {
               </BentoCard>
             )}
 
-            {isConnected && !isWrongChain && (
+            {mounted && isConnected && !isWrongChain && (
               <>
                 {/* Balance Info */}
                 <BentoCard>

@@ -118,6 +118,115 @@ export const POCKETGRANT_ABI = [
     stateMutability: 'nonpayable',
     type: 'function'
   },
+  // Request Mode
+  {
+    inputs: [
+      { name: 'programId', type: 'uint256' },
+      { name: 'amount', type: 'uint256' }
+    ],
+    name: 'submitRequest',
+    outputs: [{ name: 'requestId', type: 'uint256' }],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      { name: 'programId', type: 'uint256' },
+      { name: 'requestId', type: 'uint256' }
+    ],
+    name: 'approveRequest',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      { name: 'programId', type: 'uint256' },
+      { name: 'requestId', type: 'uint256' }
+    ],
+    name: 'rejectRequest',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  // GiftCard Mode
+  {
+    inputs: [
+      { name: 'programId', type: 'uint256' },
+      { name: 'giftCode', type: 'string' }
+    ],
+    name: 'claimGift',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  // Provider Actions
+  {
+    inputs: [{ name: 'programId', type: 'uint256' }],
+    name: 'pauseProgram',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [{ name: 'programId', type: 'uint256' }],
+    name: 'resumeProgram',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [{ name: 'programId', type: 'uint256' }],
+    name: 'endProgram',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  // Verifier Actions
+  {
+    inputs: [
+      { name: 'programId', type: 'uint256' },
+      { name: 'beneficiary', type: 'address' }
+    ],
+    name: 'verifyBeneficiary',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      { name: 'verifier', type: 'address' },
+      { name: 'status', type: 'bool' }
+    ],
+    name: 'setVerifier',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [{ name: 'paused', type: 'bool' }],
+    name: 'setGlobalPause',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'globalPaused',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [
+      { name: 'programId', type: 'uint256' },
+      { name: 'wallet', type: 'address' }
+    ],
+    name: 'verifiedBeneficiaries',
+    outputs: [{ name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
   // Events
   {
     anonymous: false,

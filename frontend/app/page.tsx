@@ -1,233 +1,152 @@
 'use client'
 
 import { useAccount } from 'wagmi'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Plus, Gift, FileText, History, ArrowRight, Github, Twitter } from 'lucide-react'
-import { BentoCard, BentoGrid } from '@/components/bento-card'
+import { HandCoins, Gift, Sparkles, ChevronRight } from 'lucide-react'
+import { HamburgerMenu } from '@/components/hamburger-menu'
 import { WalletButton } from '@/components/wallet-button'
 import { BalanceDisplay } from '@/components/balance-display'
-import { ThemeToggle } from '@/components/theme-toggle'
-import { useProgramCount } from '@/hooks/usePocketGrant'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 
-export default function Dashboard() {
+export default function Home() {
   const { isConnected } = useAccount()
-  const { data: programCount } = useProgramCount()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Animated Background */}
-      <div className="fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      <div className="fixed inset-0 -z-10">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background/80 border-b border-border backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/25">
-              <span className="text-white text-lg">💰</span>
-            </div>
-            <div>
-              <h1 className="font-bold text-xl text-foreground">PocketGrant</h1>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <WalletButton />
-          </div>
-        </div>
+      {/* Hamburger Menu */}
+      <HamburgerMenu />
+
+      {/* Header - Minimal */}
+      <header className="fixed top-0 right-0 z-50 p-4 flex items-center gap-3">
+        {mounted && <WalletButton />}
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        {/* Hero Section */}
+      <main className="min-h-screen flex flex-col items-center justify-center px-4 py-20">
+        {/* Logo & Tagline */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8"
+          className="text-center mb-12"
         >
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            Selamat Datang! 👋
-          </h2>
-          <p className="text-muted-foreground">
-            Buat dan bagikan Dana Kaget untuk pendidikan
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent mb-6 shadow-2xl shadow-primary/30">
+            <span className="text-4xl">💰</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-3">
+            PocketGrant
+          </h1>
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-md mx-auto">
+            Bantuan dana pendidikan, langsung ke dompetmu
           </p>
         </motion.div>
 
-        {/* Bento Grid */}
-        <BentoGrid className="lg:grid-cols-4">
-          {/* Card A: Balance (Hero - spans 2 cols) */}
+        {/* Balance (if connected) */}
+        {mounted && isConnected && (
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1 }}
-            className="md:col-span-2"
+            className="mb-8 p-6 rounded-2xl bg-card/80 backdrop-blur border border-border"
           >
-            <BentoCard variant="highlight" size="lg" className="h-full">
-              {isConnected ? (
-                <BalanceDisplay />
-              ) : (
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-foreground">
-                    Hubungkan Dompetmu
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Untuk mulai membuat atau mengklaim Dana Kaget
-                  </p>
-                  <WalletButton />
-                </div>
-              )}
-            </BentoCard>
+            <BalanceDisplay />
           </motion.div>
+        )}
 
-          {/* Card B: Create Program (Primary Action - spans 2 cols) */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="md:col-span-2"
-          >
-            <Link href="/create">
-              <BentoCard 
-                variant="accent" 
-                size="lg" 
-                className={cn(
-                  'h-full cursor-pointer group',
-                  'hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10 transition-all'
-                )}
-              >
-                <div className="flex items-center justify-between h-full">
-                  <div className="space-y-2">
-                    <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                      <Plus className="w-6 h-6 text-accent" />
-                    </div>
-                    <h3 className="text-xl font-bold text-foreground">
-                      Buat Dana Kaget
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      Deposit IDRX dan bagikan link ke penerima
-                    </p>
+        {/* Main Action - Request Dana */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="w-full max-w-md mb-6"
+        >
+          <Link href="/request">
+            <div className={cn(
+              'group relative overflow-hidden rounded-2xl p-6',
+              'bg-gradient-to-br from-primary to-primary/80',
+              'shadow-xl shadow-primary/25 hover:shadow-2xl hover:shadow-primary/30',
+              'active:scale-[0.98] transition-all touch-manipulation'
+            )}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                    <HandCoins className="w-7 h-7 text-white" />
                   </div>
-                  <ArrowRight className="w-6 h-6 text-muted-foreground group-hover:text-accent group-hover:translate-x-1 transition-all" />
+                  <div>
+                    <h2 className="text-xl font-bold text-white">Request Dana</h2>
+                    <p className="text-white/80 text-sm">Ajukan permohonan bantuan</p>
+                  </div>
                 </div>
-              </BentoCard>
-            </Link>
-          </motion.div>
-
-          {/* Card C: Gift Card Mode */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-          >
-            <BentoCard className="h-full cursor-pointer group hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5 transition-all">
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center">
-                  <Gift className="w-5 h-5 text-purple-500" />
-                </div>
-                <h3 className="font-bold text-foreground">Gift Card</h3>
-                <p className="text-muted-foreground text-sm">
-                  Klaim dengan kode rahasia
-                </p>
+                <ChevronRight className="w-6 h-6 text-white/80 group-hover:translate-x-1 transition-transform" />
               </div>
-            </BentoCard>
-          </motion.div>
-
-          {/* Card D: Request Mode */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <BentoCard className="h-full cursor-pointer group hover:border-green-500/30 hover:shadow-lg hover:shadow-green-500/5 transition-all">
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-green-500" />
-                </div>
-                <h3 className="font-bold text-foreground">Request Dana</h3>
-                <p className="text-muted-foreground text-sm">
-                  Ajukan permohonan bantuan
-                </p>
-              </div>
-            </BentoCard>
-          </motion.div>
-
-          {/* Card E: Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-          >
-            <BentoCard className="h-full">
-              <div className="space-y-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                  <History className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-bold text-foreground">Program Aktif</h3>
-                <p className="text-3xl font-bold text-primary">
-                  {programCount?.toString() || '0'}
-                </p>
-              </div>
-            </BentoCard>
-          </motion.div>
-
-          {/* Card F: Quick Link */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-          >
-            <BentoCard className="h-full bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900 border-gray-800">
-              <div className="space-y-3">
-                <p className="text-gray-400 text-sm">Coba klaim</p>
-                <Link 
-                  href="/claim/1" 
-                  className="text-white font-medium hover:text-primary transition-colors"
-                >
-                  Demo Dana Kaget →
-                </Link>
-                <p className="text-gray-500 text-xs">
-                  Program ID: 1
-                </p>
-              </div>
-            </BentoCard>
-          </motion.div>
-        </BentoGrid>
-
-        {/* Footer */}
-        <footer className="mt-16 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="text-center md:text-left">
-              <p className="text-muted-foreground text-sm">
-                Dibangun di Base Blockchain dengan 💙
-              </p>
-              <p className="text-muted-foreground text-xs mt-1">
-                PocketGrant © 2024 • Powered by IDRX
-              </p>
             </div>
-            <div className="flex items-center gap-4">
-              <a 
-                href="https://github.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-foreground transition-colors"
-              >
-                <Twitter className="w-5 h-5" />
-              </a>
+          </Link>
+        </motion.div>
+
+        {/* Sub Actions */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="w-full max-w-md grid grid-cols-2 gap-4"
+        >
+          {/* Claim Dana Kaget */}
+          <Link href="/claim">
+            <div className={cn(
+              'group rounded-2xl p-5 h-full',
+              'bg-card border border-border',
+              'hover:border-accent/50 hover:shadow-lg hover:shadow-accent/10',
+              'active:scale-[0.98] transition-all touch-manipulation'
+            )}>
+              <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center mb-3">
+                <Sparkles className="w-6 h-6 text-accent" />
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Dana Kaget</h3>
+              <p className="text-sm text-muted-foreground">Klaim dana gratis</p>
             </div>
-          </div>
-        </footer>
+          </Link>
+
+          {/* Gift Card - Under Construction */}
+          <Link href="/gift">
+            <div className={cn(
+              'group rounded-2xl p-5 h-full relative overflow-hidden',
+              'bg-card border border-border',
+              'hover:border-muted-foreground/30',
+              'active:scale-[0.98] transition-all touch-manipulation opacity-60'
+            )}>
+              <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-500 text-xs font-medium">
+                Soon
+              </div>
+              <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center mb-3">
+                <Gift className="w-6 h-6 text-purple-500" />
+              </div>
+              <h3 className="font-bold text-foreground mb-1">Gift Card</h3>
+              <p className="text-sm text-muted-foreground">Segera hadir</p>
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Footer tagline */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="mt-12 text-sm text-muted-foreground text-center"
+        >
+          Ditenagai oleh <span className="text-primary font-medium">Base</span> blockchain
+        </motion.p>
       </main>
     </div>
   )

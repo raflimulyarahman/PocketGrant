@@ -23,16 +23,17 @@ export function BentoCard({
   }
 
   const sizes = {
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
+    sm: 'p-3 sm:p-4',
+    md: 'p-4 sm:p-6',
+    lg: 'p-5 sm:p-8',
   }
 
   return (
     <div
       className={cn(
-        'rounded-2xl border shadow-sm',
-        'hover:shadow-md transition-all duration-300',
+        'rounded-2xl sm:rounded-3xl border shadow-sm',
+        'hover:shadow-md active:scale-[0.99] transition-all duration-200',
+        'touch-manipulation',
         variants[variant],
         sizes[size],
         className
@@ -52,11 +53,30 @@ export function BentoGrid({ children, className }: BentoGridProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4',
+        'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4',
         className
       )}
     >
       {children}
+    </div>
+  )
+}
+
+// Skeleton component for loading states
+export function BentoCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        'rounded-2xl sm:rounded-3xl border border-border bg-card p-4 sm:p-6',
+        'animate-pulse',
+        className
+      )}
+    >
+      <div className="space-y-3">
+        <div className="w-10 h-10 rounded-xl bg-muted skeleton" />
+        <div className="h-5 w-24 rounded bg-muted skeleton" />
+        <div className="h-4 w-32 rounded bg-muted skeleton" />
+      </div>
     </div>
   )
 }

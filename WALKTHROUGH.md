@@ -295,84 +295,154 @@ flowchart TD
 
 ## 📱 Frontend Application Flow
 
-### Home Dashboard
+### Home Page (`/`)
 
-[Dashboard Flow](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/page.tsx)
-
-```mermaid
-flowchart LR
-    A["Landing Page"] --> B{Wallet Connected?}
-    B -->|No| C["Show Connect Wallet Card"]
-    B -->|Yes| D["Show IDRX Balance"]
-
-    A --> E["Buat Dana Kaget Card"]
-    E --> F["/create Page"]
-
-    A --> G["Gift Card Card"]
-    A --> H["Request Dana Card"]
-    A --> I["Program Stats Card"]
-    A --> J["Demo Link Card"]
-    J --> K["/claim/1 Page"]
-```
-
-### Create Program Page
-
-[Create Page](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/create/page.tsx)
+[Home Page](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/page.tsx)
 
 ```mermaid
 flowchart TD
-    A["/create Page"] --> B{Wallet Connected?}
-    B -->|No| C["Show Connect Wallet"]
-    B -->|Yes| D{Correct Chain?}
-    D -->|No| E["Show Switch Network Button"]
-    D -->|Yes| F["Show Balance & Form"]
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    F --> G["Input Total Dana"]
-    G --> H["Input Per Claim Amount"]
-    H --> I{Needs Approval?}
+    A["Buka PocketGrant"]:::positive --> B{Wallet Connected?}:::decision
+    B -->|No| C["Show Smart Wallet Button"]:::actionNode
+    B -->|Yes| D["Show IDRX Balance"]:::infoNode
 
-    I -->|Yes| J["Click Approve IDRX"]
-    J --> K["Wait TX Confirmation"]
-    K --> F
+    A --> E["Primary CTA: Request Dana"]:::actionNode
+    E --> F["/request Page"]:::positive
 
-    I -->|No| L["Click Buat Dana Kaget"]
-    L --> M["Wait TX Confirmation"]
-    M --> N["Success! Show Share Link"]
-    N --> O["Copy Link / View Claim Page"]
+    A --> G["Secondary: Dana Kaget"]:::actionNode
+    G --> H["/claim Page"]:::positive
+
+    A --> I["Secondary: Gift Card (Soon)"]:::infoNode
+    I --> J["/gift Page - Under Construction"]:::infoNode
 ```
 
-### Claim Page
+**Fitur Home Page:**
+
+- **Request Dana** - CTA utama untuk mengajukan permohonan bantuan
+- **Dana Kaget** - One-tap claim dana gratis
+- **Gift Card** - Coming soon (under construction)
+- **IDRX Balance** - Tampil jika wallet connected
+
+---
+
+### Request Hub (`/request`)
+
+[Request Hub](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/request/page.tsx)
+
+```mermaid
+flowchart TD
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
+
+    A["/request Page"]:::positive --> B["Input Program ID"]:::actionNode
+    B --> C{Valid ID?}:::decision
+    C -->|Yes| D["Navigate to /request/:id"]:::positive
+    C -->|No| E["Show Error"]:::infoNode
+
+    D --> F["Load Program Data"]:::actionNode
+    F --> G{Wallet Connected?}:::decision
+    G -->|No| H["Show Connect Wallet"]:::actionNode
+    G -->|Yes| I["Show Request Form"]:::actionNode
+    I --> J["Submit Request"]:::actionNode
+    J --> K["Tunggu Approval Provider"]:::infoNode
+    K --> L["Dana Masuk saat Approved!"]:::positive
+```
+
+---
+
+### Claim Hub (`/claim`)
+
+[Claim Hub](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/claim/page.tsx)
+
+```mermaid
+flowchart TD
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
+
+    A["/claim Page"]:::positive --> B["Cari Program (Input ID)"]:::actionNode
+    B --> C{Valid ID?}:::decision
+    C -->|Yes| D["Navigate to /claim/:id"]:::positive
+
+    A --> E["Pilih Dana Kaget"]:::actionNode
+    E --> F["/claim/1 (Default)"]:::positive
+
+    A --> G["Pilih Gift Card"]:::actionNode
+    G --> H["/gift/construction - Coming Soon"]:::infoNode
+```
+
+---
+
+### Claim Program Page (`/claim/:id`)
 
 [Claim Page](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/claim/[id]/page.tsx)
 
 ```mermaid
 flowchart TD
-    A["/claim/:id Page"] --> B["Load Program Data"]
-    B --> C{Loading?}
-    C -->|Yes| D["Show Loader"]
-    C -->|No| E{Wallet Connected?}
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    E -->|No| F["Show Connect Wallet"]
-    E -->|Yes| G{Already Claimed?}
+    A["/claim/:id Page"]:::positive --> B["Load Program Data"]:::actionNode
+    B --> C{Wallet Connected?}:::decision
+    C -->|No| D["Show Connect Wallet"]:::actionNode
+    C -->|Yes| E{Already Claimed?}:::decision
 
-    G -->|Yes| H["Show Sudah Klaim Message"]
-    G -->|No| I{Fund Available?}
+    E -->|Yes| F["Show Sudah Klaim Message"]:::infoNode
+    E -->|No| G{Fund Available?}:::decision
 
-    I -->|No| J["Show Dana Habis Message"]
-    I -->|Yes| K{Correct Chain?}
+    G -->|No| H["Show Dana Habis Message"]:::danger
+    G -->|Yes| I{Correct Chain?}:::decision
 
-    K -->|No| L["Show Switch Network Button"]
-    K -->|Yes| M["Show Claim Button"]
+    I -->|No| J["Show Switch Network Button"]:::actionNode
+    I -->|Yes| K["Show Claim Button"]:::positive
 
-    M --> N["Click AMBIL DANA SEKARANG"]
-    N --> O{Paymaster Available?}
-    O -->|Yes| P["Gasless Transaction"]
-    O -->|No| Q["Normal Transaction"]
+    K --> L["Tap AMBIL DANA"]:::actionNode
+    L --> M["Wait Confirmation"]:::actionNode
+    M --> N["🎉 Confetti + Success!"]:::positive
+    N --> O["Show BaseScan Link"]:::infoNode
+```
 
-    P --> R["Wait Confirmation"]
-    Q --> R
-    R --> S["🎉 Confetti + Success Message"]
-    S --> T["Show BaseScan Link"]
+---
+
+### Create Program Page (`/create`)
+
+[Create Page](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/create/page.tsx)
+
+```mermaid
+flowchart TD
+    classDef positive stroke:#333,stroke-width:2px,fill:#c8e6c9,color:#000
+    classDef actionNode stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef infoNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
+
+    A["/create Page"]:::positive --> B{Wallet Connected?}:::decision
+    B -->|No| C["Show Connect Wallet"]:::actionNode
+    B -->|Yes| D{Correct Chain?}:::decision
+    D -->|No| E["Show Switch Network Button"]:::actionNode
+    D -->|Yes| F["Show Balance & Form"]:::actionNode
+
+    F --> G["Input Total Dana"]:::actionNode
+    G --> H["Input Per Claim Amount"]:::actionNode
+    H --> I{Needs Approval?}:::decision
+
+    I -->|Yes| J["Click Approve IDRX"]:::actionNode
+    J --> K["Wait TX Confirmation"]:::actionNode
+    K --> F
+
+    I -->|No| L["Click Buat Dana Kaget"]:::actionNode
+    L --> M["Wait TX Confirmation"]:::actionNode
+    M --> N["Success! Show Share Link"]:::positive
+    N --> O["Copy Link / View Claim Page"]:::actionNode
 ```
 
 ---
@@ -484,9 +554,11 @@ classDiagram
 - **Framework**: Next.js 14 (App Router)
 - **Styling**: Tailwind CSS
 - **Web3**: Wagmi + Viem
-- **Wallet**: Coinbase Smart Wallet (OnchainKit)
+- **Wallet**: Coinbase Smart Wallet via OnchainKit
+  - Passkey/Fingerprint authentication
+  - Gasless transactions (with Paymaster)
 - **Animations**: Framer Motion
-- **UI**: Radix UI primitives
+- **UI**: Custom components + Lucide icons
 
 ---
 
@@ -504,7 +576,7 @@ classDiagram
 ### Provider Demo
 
 1. **Connect Wallet** - Hubungkan ke Base network dengan saldo IDRX
-2. **Buka Create Page** - Klik "Buat Dana Kaget" dari dashboard
+2. **Buka Create Page** - Akses `/create` dari menu
 3. **Input Dana** - Total: 100,000 IDRX, Per Claim: 10,000 IDRX
 4. **Approve & Create** - Approve token lalu buat program
 5. **Share Link** - Copy link atau generate QR untuk dibagikan
@@ -512,7 +584,7 @@ classDiagram
 ### User Demo
 
 1. **Buka Link** - Scan QR atau klik link dari provider
-2. **Connect Wallet** - Hubungkan wallet (bisa Smart Wallet)
+2. **Connect Wallet** - Gunakan Smart Wallet (Fingerprint)
 3. **Tap "AMBIL"** - One-tap claim dana
 4. **Cek Balance** - IDRX bertambah instant di wallet
 5. **View on BaseScan** - Lihat transaksi untuk transparansi
