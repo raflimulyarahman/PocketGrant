@@ -97,30 +97,34 @@ Admin adalah super-user yang memiliki kontrol global atas sistem.
 
 ```mermaid
 flowchart TD
-    A[Admin Login] --> B{Pilih Aksi}
+    classDef adminLogin stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef manage stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef emergency stroke:#333,stroke-width:1px,fill:#f3e5f5,color:#000
+    classDef transfer stroke:#333,stroke-width:1px,fill:#e3f2fd,color:#000
+    classDef event stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    B --> C[Manage Verifiers]
-    C --> C1[setVerifier - Add Verifier]
-    C --> C2[setVerifier - Remove Verifier]
+    A[Admin Login]:::adminLogin --> B{Pilih Aksi}:::decision
 
-    B --> D[Emergency Controls]
-    D --> D1[setGlobalPause - Pause All]
-    D --> D2[setGlobalPause - Resume All]
+    B --> C[Manage Verifiers]:::manage
+    C --> C1[setVerifier - Add Verifier]:::manage
+    C --> C2[setVerifier - Remove Verifier]:::manage
 
-    B --> E[Transfer Admin]
-    E --> E1[transferAdmin to New Address]
+    B --> D[Emergency Controls]:::emergency
+    D --> D1[setGlobalPause - Pause All]:::danger
+    D --> D2[setGlobalPause - Resume All]:::success
 
-    C1 --> F[Emit VerifierUpdated Event]
+    B --> E[Transfer Admin]:::transfer
+    E --> E1[transferAdmin to New Address]:::transfer
+
+    C1 --> F[Emit VerifierUpdated Event]:::event
     C2 --> F
-    D1 --> G[Emit GlobalPauseUpdated Event]
+    D1 --> G[Emit GlobalPauseUpdated Event]:::event
     D2 --> G
-    E1 --> H[Emit AdminTransferred Event]
+    E1 --> H[Emit AdminTransferred Event]:::event
 
-    style A fill:#ff6b6b
-    style B fill:#feca57
-    style C fill:#48dbfb
-    style D fill:#ff9ff3
-    style E fill:#54a0ff
+    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
+    classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
 ```
 
 **Fungsi Admin:**
@@ -138,29 +142,36 @@ Provider adalah penyedia dana yang membuat dan mengelola program distribusi.
 
 ```mermaid
 flowchart TD
-    A[Provider Login] --> B[Approve IDRX Token]
-    B --> C[Create Program]
+    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef action stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef subNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
+    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
+    classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
 
-    C --> D{Pilih Mode}
-    D --> D1[Dana Kaget Mode]
-    D --> D2[Request Mode]
-    D --> D3[GiftCard Mode]
+    A[Provider Login]:::startNode --> B[Approve IDRX Token]:::action
+    B --> C[Create Program]:::action
 
-    D1 --> E[Set Config]
+    C --> D{Pilih Mode}:::decision
+    D --> D1[Dana Kaget Mode]:::action
+    D --> D2[Request Mode]:::action
+    D --> D3[GiftCard Mode]:::action
+
+    D1 --> E[Set Config]:::subNode
     D2 --> E
-    D3 --> F[Generate Gift Code Hash]
+    D3 --> F[Generate Gift Code Hash]:::subNode
     F --> E
 
-    E --> G[Deposit IDRX ke Contract]
-    G --> H[Program Created!]
-    H --> I[Share Link/QR]
+    E --> G[Deposit IDRX ke Contract]:::action
+    G --> H[Program Created!]:::success
+    H --> I[Share Link/QR]:::action
 
     subgraph "Program Management"
-        J[Top Up Program]
-        K[Pause Program]
-        L[Resume Program]
-        M[End Program]
-        N[Withdraw Remaining]
+        J[Top Up Program]:::action
+        K[Pause Program]:::danger
+        L[Resume Program]:::success
+        M[End Program]:::danger
+        N[Withdraw Remaining]:::danger
     end
 
     H --> J
@@ -170,16 +181,11 @@ flowchart TD
     M --> N
 
     subgraph "Request Mode Only"
-        O[Review Requests]
-        O --> P[Approve & Pay]
+        O[Review Requests]:::action
+        O --> P[Approve & Pay]:::success
     end
 
     D2 --> O
-
-    style A fill:#1dd1a1
-    style C fill:#feca57
-    style H fill:#54a0ff
-    style N fill:#ff6b6b
 ```
 
 **Fungsi Provider:**
@@ -201,23 +207,24 @@ Verifier bertanggung jawab memverifikasi beneficiary sebelum mereka bisa claim/r
 
 ```mermaid
 flowchart TD
-    A[Verifier Login] --> B{Verifikasi Beneficiary}
+    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef action stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
+    classDef subNode stroke:#333,stroke-width:1px,fill:#f5f5f5,color:#000
 
-    B --> C[Single Verification]
-    C --> C1["verifyBeneficiary(programId, beneficiary)"]
+    A[Verifier Login]:::startNode --> B{Verifikasi Beneficiary}:::decision
 
-    B --> D[Batch Verification]
-    D --> D1["verifyBeneficiaries(programId, beneficiaries[])"]
+    B --> C[Single Verification]:::action
+    C --> C1["verifyBeneficiary(programId, beneficiary)"]:::action
 
-    C1 --> E[Emit BeneficiaryVerified Event]
+    B --> D[Batch Verification]:::action
+    D --> D1["verifyBeneficiaries(programId, beneficiaries[])"]:::action
+
+    C1 --> E[Emit BeneficiaryVerified Event]:::subNode
     D1 --> E
 
-    E --> F[Beneficiary Dapat Claim/Request]
-
-    style A fill:#5f27cd
-    style C fill:#48dbfb
-    style D fill:#ff9ff3
-    style F fill:#1dd1a1
+    E --> F[Beneficiary Dapat Claim/Request]:::success
 ```
 
 **Fungsi Verifier:**
@@ -234,44 +241,44 @@ Beneficiary adalah penerima dana yang melakukan claim atau submit request.
 
 ```mermaid
 flowchart TD
-    A[User Buka Link/QR] --> B[Connect Wallet]
-    B --> C{Check Program Mode}
+    classDef startNode stroke:#333,stroke-width:2px,fill:#e1f5fe,color:#000
+    classDef decision stroke:#333,stroke-width:1px,fill:#fff9c4,color:#000
+    classDef action stroke:#333,stroke-width:1px,fill:#bbdefb,color:#000
+    classDef success stroke:#333,stroke-width:1px,fill:#c8e6c9,color:#000
+    classDef danger stroke:#333,stroke-width:1px,fill:#ffcdd2,color:#000
+    classDef info stroke:#333,stroke-width:1px,fill:#e0f7fa,color:#000
 
-    C --> D[Dana Kaget Mode]
-    D --> D1{Sudah Claim?}
-    D1 -->|Ya| D2[Tampilkan "Sudah Klaim"]
-    D1 -->|Tidak| D3{Dana Tersedia?}
-    D3 -->|Ya| D4["Tap AMBIL DANA"]
-    D3 -->|Tidak| D5[Tampilkan "Dana Habis"]
-    D4 --> D6[claimDanaKaget]
-    D6 --> D7[🎉 Dana Masuk Wallet!]
+    A[User Buka Link/QR]:::startNode --> B[Connect Wallet]:::action
+    B --> C{Check Program Mode}:::decision
 
-    C --> E[Request Mode]
-    E --> E1{Perlu Verifikasi?}
-    E1 -->|Ya| E2{Sudah Verified?}
-    E2 -->|Tidak| E3[Tunggu Verifikasi]
-    E2 -->|Ya| E4[Submit Request]
+    C --> D[Dana Kaget Mode]:::info
+    D --> D1{Sudah Claim?}:::decision
+    D1 -->|Ya| D2[Tampilkan Sudah Klaim]:::decision
+    D1 -->|Tidak| D3{Dana Tersedia?}:::decision
+    D3 -->|Ya| D4["Tap AMBIL DANA"]:::action
+    D3 -->|Tidak| D5[Tampilkan Dana Habis]:::danger
+    D4 --> D6[claimDanaKaget]:::action
+    D6 --> D7[🎉 Dana Masuk Wallet!]:::success
+
+    C --> E[Request Mode]:::info
+    E --> E1{Perlu Verifikasi?}:::decision
+    E1 -->|Ya| E2{Sudah Verified?}:::decision
+    E2 -->|Tidak| E3[Tunggu Verifikasi]:::decision
+    E2 -->|Ya| E4[Submit Request]:::action
     E1 -->|Tidak| E4
-    E4 --> E5[Tunggu Approval Provider]
-    E5 --> E6[Dana Masuk saat Approved!]
+    E4 --> E5[Tunggu Approval Provider]:::action
+    E5 --> E6[Dana Masuk saat Approved!]:::success
 
-    C --> F[GiftCard Mode]
-    F --> F1{Perlu Verifikasi?}
-    F1 -->|Ya| F2{Sudah Verified?}
-    F2 -->|Tidak| F3[Tunggu Verifikasi]
-    F2 -->|Ya| F4[Masukkan Gift Code]
+    C --> F[GiftCard Mode]:::info
+    F --> F1{Perlu Verifikasi?}:::decision
+    F1 -->|Ya| F2{Sudah Verified?}:::decision
+    F2 -->|Tidak| F3[Tunggu Verifikasi]:::decision
+    F2 -->|Ya| F4[Masukkan Gift Code]:::action
     F1 -->|Tidak| F4
-    F4 --> F5{Code Valid?}
-    F5 -->|Ya| F6[claimGift]
-    F5 -->|Tidak| F7[Invalid Code Error]
-    F6 --> F8[🎁 Dana Masuk Wallet!]
-
-    style A fill:#00d2d3
-    style D7 fill:#1dd1a1
-    style E6 fill:#1dd1a1
-    style F8 fill:#1dd1a1
-    style D2 fill:#feca57
-    style D5 fill:#ff6b6b
+    F4 --> F5{Code Valid?}:::decision
+    F5 -->|Ya| F6[claimGift]:::action
+    F5 -->|Tidak| F7[Invalid Code Error]:::danger
+    F6 --> F8[🎁 Dana Masuk Wallet!]:::success
 ```
 
 **Fungsi Beneficiary:**
@@ -287,76 +294,82 @@ flowchart TD
 
 ### Home Dashboard
 
+[Dashboard Flow](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/page.tsx)
+
 ```mermaid
 flowchart LR
-    A[Landing Page] --> B{Wallet Connected?}
-    B -->|No| C[Show "Connect Wallet" Card]
-    B -->|Yes| D[Show IDRX Balance]
+    A["Landing Page"] --> B{Wallet Connected?}
+    B -->|No| C["Show Connect Wallet Card"]
+    B -->|Yes| D["Show IDRX Balance"]
 
-    A --> E[Buat Dana Kaget Card]
-    E --> F["/create" Page]
+    A --> E["Buat Dana Kaget Card"]
+    E --> F["/create Page"]
 
-    A --> G[Gift Card Card]
-    A --> H[Request Dana Card]
-    A --> I[Program Stats Card]
-    A --> J[Demo Link Card]
-    J --> K["/claim/1" Page]
+    A --> G["Gift Card Card"]
+    A --> H["Request Dana Card"]
+    A --> I["Program Stats Card"]
+    A --> J["Demo Link Card"]
+    J --> K["/claim/1 Page"]
 ```
 
 ### Create Program Page
 
+[Create Page](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/create/page.tsx)
+
 ```mermaid
 flowchart TD
-    A["/create" Page] --> B{Wallet Connected?}
-    B -->|No| C[Show Connect Wallet]
+    A["/create Page"] --> B{Wallet Connected?}
+    B -->|No| C["Show Connect Wallet"]
     B -->|Yes| D{Correct Chain?}
-    D -->|No| E[Show Switch Network Button]
-    D -->|Yes| F[Show Balance & Form]
+    D -->|No| E["Show Switch Network Button"]
+    D -->|Yes| F["Show Balance & Form"]
 
-    F --> G[Input Total Dana]
-    G --> H[Input Per Claim Amount]
+    F --> G["Input Total Dana"]
+    G --> H["Input Per Claim Amount"]
     H --> I{Needs Approval?}
 
-    I -->|Yes| J[Click Approve IDRX]
-    J --> K[Wait TX Confirmation]
+    I -->|Yes| J["Click Approve IDRX"]
+    J --> K["Wait TX Confirmation"]
     K --> F
 
-    I -->|No| L[Click "Buat Dana Kaget"]
-    L --> M[Wait TX Confirmation]
-    M --> N[Success! Show Share Link]
-    N --> O[Copy Link / View Claim Page]
+    I -->|No| L["Click Buat Dana Kaget"]
+    L --> M["Wait TX Confirmation"]
+    M --> N["Success! Show Share Link"]
+    N --> O["Copy Link / View Claim Page"]
 ```
 
 ### Claim Page
 
+[Claim Page](file:///home/sofi-mulyarahman/PocketGrants/frontend/app/claim/[id]/page.tsx)
+
 ```mermaid
 flowchart TD
-    A["/claim/:id" Page] --> B[Load Program Data]
+    A["/claim/:id Page"] --> B["Load Program Data"]
     B --> C{Loading?}
-    C -->|Yes| D[Show Loader]
+    C -->|Yes| D["Show Loader"]
     C -->|No| E{Wallet Connected?}
 
-    E -->|No| F[Show Connect Wallet]
+    E -->|No| F["Show Connect Wallet"]
     E -->|Yes| G{Already Claimed?}
 
-    G -->|Yes| H[Show "Sudah Klaim" Message]
+    G -->|Yes| H["Show Sudah Klaim Message"]
     G -->|No| I{Fund Available?}
 
-    I -->|No| J[Show "Dana Habis" Message]
+    I -->|No| J["Show Dana Habis Message"]
     I -->|Yes| K{Correct Chain?}
 
-    K -->|No| L[Show Switch Network Button]
-    K -->|Yes| M[Show Claim Button]
+    K -->|No| L["Show Switch Network Button"]
+    K -->|Yes| M["Show Claim Button"]
 
-    M --> N[Click "AMBIL DANA SEKARANG"]
+    M --> N["Click AMBIL DANA SEKARANG"]
     N --> O{Paymaster Available?}
-    O -->|Yes| P[Gasless Transaction]
-    O -->|No| Q[Normal Transaction]
+    O -->|Yes| P["Gasless Transaction"]
+    O -->|No| Q["Normal Transaction"]
 
-    P --> R[Wait Confirmation]
+    P --> R["Wait Confirmation"]
     Q --> R
-    R --> S[🎉 Confetti + Success Message]
-    S --> T[Show BaseScan Link]
+    R --> S["🎉 Confetti + Success Message"]
+    S --> T["Show BaseScan Link"]
 ```
 
 ---
