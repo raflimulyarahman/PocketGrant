@@ -139,6 +139,12 @@ function ProgramCard({ programId }: { programId: bigint }) {
 export default function ProviderPage() {
   const { address, isConnected } = useAccount()
   const { data: programCount, isLoading: loadingCount, refetch } = useProgramCount()
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
   
   const programIds = programCount 
     ? Array.from({ length: Number(programCount) }, (_, i) => BigInt(i + 1))
@@ -187,16 +193,17 @@ export default function ProviderPage() {
           </div>
           
           {/* Programs List */}
-          {!isConnected ? (
+          {!mounted || loadingCount ? (
+            <div className="flex justify-center py-12">
+              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            </div>
+          ) : !isConnected ? (
             <BentoCard className="text-center py-12">
               <p className="text-muted-foreground mb-4">Hubungkan wallet untuk melihat program kamu</p>
               <WalletButton />
             </BentoCard>
-          ) : loadingCount ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
-            </div>
           ) : programIds.length === 0 ? (
+
             <BentoCard className="text-center py-12">
               <p className="text-muted-foreground mb-4">Belum ada program yang dibuat</p>
               <Link
