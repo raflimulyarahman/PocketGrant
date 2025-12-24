@@ -3,7 +3,7 @@
 import { useAccount, useConnect, useDisconnect } from 'wagmi'
 import { truncateAddress, cn } from '@/lib/utils'
 import { Wallet, LogOut, ChevronDown, ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export function WalletButton() {
   const { address, isConnected, connector } = useAccount()
@@ -11,12 +11,26 @@ export function WalletButton() {
   const { disconnect } = useDisconnect()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showWalletOptions, setShowWalletOptions] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  // Prevent hydration mismatch
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Get available connectors
   const injectedConnector = connectors.find((c) => c.id === 'injected')
   const coinbaseConnector = connectors.find((c) => c.id === 'coinbaseWalletSDK')
 
+  // Show skeleton until mounted to prevent hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="w-32 h-[44px] rounded-xl bg-muted animate-pulse" />
+    )
+  }
+
   if (isConnected && address) {
+
     return (
       <div className="relative">
         <button
