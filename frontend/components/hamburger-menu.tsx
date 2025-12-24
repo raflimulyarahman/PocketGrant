@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Home, HandCoins, Gift, Heart, Shield, Sun, Moon } from 'lucide-react'
+import { Menu, X, Home, HandCoins, Gift, Heart, Shield, Sun, Moon, Sparkles, FileText, Users } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -19,9 +19,12 @@ const navItems: NavItem[] = [
   { label: 'Beranda', href: '/', icon: <Home className="w-5 h-5" />, description: 'Kembali ke halaman utama' },
   { label: 'Request Dana', href: '/request', icon: <HandCoins className="w-5 h-5" />, description: 'Ajukan permohonan bantuan' },
   { label: 'Claim Dana', href: '/claim', icon: <Gift className="w-5 h-5" />, description: 'Klaim Dana Kaget atau Gift Card' },
-  { label: 'My Donation', href: '/donate', icon: <Heart className="w-5 h-5" />, description: 'Buat program donasi' },
+  { label: 'Buat Dana Kaget', href: '/create', icon: <Sparkles className="w-5 h-5" />, description: 'Bagikan hadiah untuk seru-seruan' },
+  { label: 'Buat Beasiswa', href: '/provider/create', icon: <FileText className="w-5 h-5" />, description: 'Program bantuan profesional' },
+  { label: 'Kelola Program', href: '/provider', icon: <Users className="w-5 h-5" />, description: 'Lihat dan kelola program Anda' },
   { label: 'Admin', href: '/admin', icon: <Shield className="w-5 h-5" />, description: 'Verifikasi pengguna' },
 ]
+
 
 export function HamburgerMenu() {
   const [isOpen, setIsOpen] = useState(false)
