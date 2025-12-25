@@ -65,6 +65,31 @@ contract PocketGrant is ReentrancyGuard {
         bool requireVerification; // V2: Require verification for this program
     }
 
+    // V3: Beneficiary Profile
+    struct BeneficiaryProfile {
+        string name; // Nama lengkap
+        string institution; // Nama institusi (kampus/sekolah)
+        string studentId; // NIM/NISN
+        string description; // Info tambahan (jurusan, email, dll)
+        uint64 registeredAt; // Timestamp registrasi
+        bool isRegistered; // Status registrasi
+    }
+
+    // V3: Verifier Types
+    enum VerifierType {
+        University, // Kampus/Universitas
+        School, // Sekolah K-12
+        ThirdParty, // Lembaga pihak ketiga
+        Government // Instansi pemerintah
+    }
+
+    // V3: Verifier Information
+    struct VerifierInfo {
+        string name; // Nama institusi verifier
+        VerifierType vType; // Tipe verifier
+        bool isActive; // Status aktif
+    }
+
     // ============ State Variables ============
 
     /// @notice The IDRX token used for all transfers
@@ -103,6 +128,15 @@ contract PocketGrant is ReentrancyGuard {
     /// @notice Amount claimed per wallet per program
     mapping(uint256 => mapping(address => uint256)) public claimedAmount;
 
+    // V3: Beneficiary profiles
+    mapping(address => BeneficiaryProfile) public profiles;
+
+    // V3: Verifier information
+    mapping(address => VerifierInfo) public verifierInfo;
+
+    // V3: Total registered profiles counter
+    uint256 public totalRegisteredProfiles;
+
     // ============ Custom Errors ============
 
     error InvalidAmount();
@@ -126,6 +160,9 @@ contract PocketGrant is ReentrancyGuard {
     error ZeroAddress();
     error ContractPaused();
     error AlreadyVerified();
+    error ProfileAlreadyRegistered(); // V3
+    error ProfileNotRegistered(); // V3
+    error EmptyName(); // V3
 
     // ============ Events ============
 
@@ -175,6 +212,19 @@ contract PocketGrant is ReentrancyGuard {
         address indexed verifier
     );
     event GlobalPauseUpdated(bool paused);
+
+    // V3 Events
+    event ProfileRegistered(
+        address indexed wallet,
+        string name,
+        string institution
+    );
+    event ProfileUpdated(address indexed wallet);
+    event VerifierInfoUpdated(
+        address indexed verifier,
+        string name,
+        VerifierType vType
+    );
 
     // ============ Constructor ============
 
@@ -271,6 +321,109 @@ contract PocketGrant is ReentrancyGuard {
                 );
             }
         }
+    }
+
+    // ============ Profile Functions (V3) ============
+
+    /// @notice Register beneficiary profile (user calls this)
+    function registerProfile(
+        string calldata name,
+        string calldata institution,
+        string calldata studentId,
+        string calldata description
+    ) external {
+        if (bytes(name).length == 0) revert EmptyName();
+        if (profiles[msg.sender].isRegistered)
+            revert ProfileAlreadyRegistered();
+
+        profiles[msg.sender] = BeneficiaryProfile({
+            name: name,
+            institution: institution,
+            studentId: studentId,
+            description: description,
+            registeredAt: uint64(block.timestamp),
+            isRegistered: true
+        });
+
+        totalRegisteredProfiles++;
+        emit ProfileRegistered(msg.sender, name, institution);
+    }
+
+    /// @notice Update existing profile
+    function updateProfile(
+        string calldata name,
+        string calldata institution,
+        string calldata studentId,
+        string calldata description
+    ) external {
+        if (!profiles[msg.sender].isRegistered) revert ProfileNotRegistered();
+        if (bytes(name).length == 0) revert EmptyName();
+
+        BeneficiaryProfile storage profile = profiles[msg.sender];
+        profile.name = name;
+        profile.institution = institution;
+        profile.studentId = studentId;
+        profile.description = description;
+
+        emit ProfileUpdated(msg.sender);
+    }
+
+    /// @notice Set verifier with institution info (admin only)
+    function setVerifierWithInfo(
+        address verifier,
+        string calldata name,
+        VerifierType vType,
+        bool isActive
+    ) external onlyAdmin {
+        if (verifier == address(0)) revert ZeroAddress();
+
+        verifiers[verifier] = isActive;
+        verifierInfo[verifier] = VerifierInfo({
+            name: name,
+            vType: vType,
+            isActive: isActive
+        });
+
+        emit VerifierUpdated(verifier, isActive);
+        emit VerifierInfoUpdated(verifier, name, vType);
+    }
+
+    /// @notice Get beneficiary profile
+    function getProfile(
+        address wallet
+    )
+        external
+        view
+        returns (
+            string memory name,
+            string memory institution,
+            string memory studentId,
+            string memory description,
+            uint64 registeredAt,
+            bool isRegistered
+        )
+    {
+        BeneficiaryProfile storage p = profiles[wallet];
+        return (
+            p.name,
+            p.institution,
+            p.studentId,
+            p.description,
+            p.registeredAt,
+            p.isRegistered
+        );
+    }
+
+    /// @notice Get verifier info
+    function getVerifierInfo(
+        address verifier
+    )
+        external
+        view
+        returns (string memory name, VerifierType vType, bool isActive)
+    {
+        VerifierInfo storage v = verifierInfo[verifier];
+        return (v.name, v.vType, v.isActive);
     }
 
     // ============ Provider Functions ============
